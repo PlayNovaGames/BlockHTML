@@ -1,0 +1,373 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BlockHTML V0.2 Alpha</title>
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <style>
+    html, body { margin:0; height:100%; background:#121212; color:#fff; overflow:hidden; }
+    #topbar { height:40px; background:#1f1f1f; display:flex; align-items:center; justify-content:space-between; padding:0 10px; }
+    #topbar span { font-weight:bold; }
+    #topbar button { margin-left:10px; background:#03dac6; border:none; padding:6px 12px; cursor:pointer; color:black; }
+    #editor { height:calc(100% - 40px); }
+    #blocklyDiv { width:100%; height:100%; }
+    #preview { display:none; position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); border:none; background:#fff; z-index:10; }
+  </style>
+</head>
+<body>
+  <div id="topbar">
+    <span>BlockHTML V0.3 Alpha</span>
+    <div>
+      <button id="downloadBtn">Download Code</button>
+      <button id="runBtn">Run</button>
+      <button id="stopBtn" style="display:none;">Stop</button>
+    </div>
+  </div>
+
+  <div id="editor">
+    <div id="blocklyDiv"></div>
+  </div>
+
+  <iframe id="preview" sandbox="allow-scripts allow-same-origin"></iframe>
+
+  <xml id="toolbox" style="display:none">
+    <block type="when_html_starts"></block>
+    <block type="title_block"></block>
+    <block type="show_title"></block>
+    <block type="hide_title"></block>
+    <block type="wait_seconds"></block>
+    <block type="wait_until"></block>
+    <block type="if_block"></block>
+    <block type="if_else_block"></block>
+    <block type="forever_loop"></block>
+    <block type="mouse_down"></block>
+    <block type="key_pressed"></block>
+    <block type="button_create"></block>
+    <block type="button_pressed"></block>
+    <block type="logic_boolean"></block>
+    <block type="math_operation"></block>
+    <block type="logic_not"></block>
+    <block type="logic_compare"></block>
+    <block type="change_background_color"></block>
+    <block type="change_title_color"></block>
+  </xml>
+
+  <script>
+window.onload = function() {
+  Blockly.defineBlocksWithJsonArray([
+    { type: "when_html_starts", message0: "When HTML starts", nextStatement: null, colour: 230 },
+    { type: "title_block", message0: "Create title %1 font %2 X:%3 Y:%4",
+      args0: [
+        { type: "field_input", name: "text", text: "Hello" },
+        { type: "field_dropdown", name: "font", options:[["Arial","Arial"],["Verdana","Verdana"],["Times","Times"],["Courier","Courier"]] },
+        { type: "field_number", name: "x", value: 0 },
+        { type: "field_number", name: "y", value: 0 }
+      ],
+      previousStatement: null, nextStatement: null, colour: 160
+    },
+    { type: "show_title", message0: "Show title %1", args0:[{type:"field_input",name:"text",text:"Hello"}], previousStatement:null,nextStatement:null,colour:100 },
+    { type: "hide_title", message0: "Hide title %1", args0:[{type:"field_input",name:"text",text:"Hello"}], previousStatement:null,nextStatement:null,colour:100 },
+    { type: "wait_seconds", message0: "Wait %1 seconds", args0:[{type:"field_number",name:"seconds",value:1}], previousStatement:null,nextStatement:null,colour:65 },
+
+    // Wait until block
+    { type: "wait_until", message0: "Wait until %1", args0: [{type:"input_value", name:"COND", check:"Boolean"}], previousStatement:null, nextStatement:null, colour:65 },
+
+    { type: "if_block", message0: "If %1 do %2", args0:[{type:"input_value",name:"condition",check:"Boolean"},{type:"input_statement",name:"DO"}], previousStatement:null,nextStatement:null,colour:210 },
+    { type: "if_else_block", message0: "If %1 do %2 else %3", args0:[{type:"input_value",name:"condition",check:"Boolean"},{type:"input_statement",name:"DO"},{type:"input_statement",name:"ELSE"}], previousStatement:null,nextStatement:null,colour:210 },
+    { type: "forever_loop", message0: "Forever %1", args0:[{type:"input_statement",name:"DO"}], previousStatement:null,nextStatement:null,colour:290 },
+    { type: "mouse_down", message0: "Mouse down?", output:"Boolean", colour:120 },
+    { type: "key_pressed", message0: "Key %1 pressed?",
+      args0:[{ type:"field_dropdown", name:"key", options:[
+        ["A","a"],["B","b"],["C","c"],["D","d"],["E","e"],["F","f"],
+        ["G","g"],["H","h"],["I","i"],["J","j"],["K","k"],["L","l"],
+        ["M","m"],["N","n"],["O","o"],["P","p"],["Q","q"],["R","r"],
+        ["S","s"],["T","t"],["U","u"],["V","v"],["W","w"],["X","x"],
+        ["Y","y"],["Z","z"],["Space"," "],["Enter","Enter"],
+        ["ArrowUp","ArrowUp"],["ArrowDown","ArrowDown"],
+        ["ArrowLeft","ArrowLeft"],["ArrowRight","ArrowRight"],
+        ["Shift","Shift"],["Control","Control"],["Alt","Alt"]
+      ]}],
+      output:"Boolean",colour:120
+    },
+
+    // Create Button block
+    {
+      type: "button_create",
+      message0: "Create button %1 at X: %2 Y: %3 width: %4 height: %5 color (hex): %6",
+      args0: [
+        { type: "field_input", name: "name", text: "btn" },
+        { type: "field_number", name: "x", value: 0 },
+        { type: "field_number", name: "y", value: 0 },
+        { type: "field_number", name: "width", value: 100, min:1 },
+        { type: "field_number", name: "height", value: 30, min:1 },
+        { type: "field_input", name: "color", text: "#03dac6" }
+      ],
+      previousStatement: null,
+      nextStatement: null,
+      colour: 160
+    },
+
+    // Button pressed block
+    {
+      type: "button_pressed",
+      message0: "Is button %1 pressed?",
+      args0: [
+        { type: "field_input", name: "name", text: "btn" }
+      ],
+      output: "Boolean",
+      colour: 120
+    },
+
+    // Boolean dropdown block (true/false)
+    {
+      type: "logic_boolean",
+      message0: "%1",
+      args0: [
+        { type: "field_dropdown", name: "BOOL", options: [["true", "true"], ["false", "false"]] }
+      ],
+      output: "Boolean",
+      colour: 210
+    },
+
+    { type: "math_operation", message0: "%1 %2 %3",
+      args0:[{type:"input_value",name:"A",check:"Number"},{type:"field_dropdown",name:"OP",options:[["+","+"],["-","-"],["×","*"],["÷","/"]]},{type:"input_value",name:"B",check:"Number"}],
+      output:"Number",colour:230
+    },
+    { type: "logic_not", message0: "Not %1", args0:[{type:"input_value",name:"BOOL",check:"Boolean"}], output:"Boolean",colour:210 },
+    { type: "logic_compare", message0: "%1 = %2", args0:[
+      {type:"input_value",name:"A"},
+      {type:"input_value",name:"B"}
+    ], output:"Boolean", colour:210 },
+
+    // Change colour hex input
+    {
+      type: "change_background_color",
+      message0: "Change background colour to %1",
+      args0: [
+        { type: "field_input", name: "color", text: "#ffffff" }
+      ],
+      previousStatement: null,
+      nextStatement: null,
+      colour: 20
+    },
+    {
+      type: "change_title_color",
+      message0: "Change title colour of %1 to %2",
+      args0: [
+        { type: "field_input", name: "text", text: "Hello" },
+        { type: "field_input", name: "color", text: "#000000" }
+      ],
+      previousStatement: null,
+      nextStatement: null,
+      colour: 20
+    }
+  ]);
+
+  const theme = Blockly.Theme.defineTheme('dark', {
+    base: Blockly.Themes.Classic,
+    componentStyles: {
+      workspaceBackgroundColour:'#1e1e1e',
+      toolboxBackgroundColour:'#2b2b2b',
+      toolboxForegroundColour:'#fff',
+      flyoutBackgroundColour:'#252526',
+      flyoutForegroundColour:'#ccc',
+      scrollbarColour:'#555',
+      insertionMarkerColour:'#fff'
+    }
+  });
+
+  const workspace = Blockly.inject('blocklyDiv', {toolbox:document.getElementById('toolbox'), theme, scrollbars:true});
+
+  function genExpr(block) {
+    if(!block) return 'false';
+    const t = block.type;
+    switch(t) {
+      case 'mouse_down': return 'mousedown';
+      case 'key_pressed': return `pressedKeys["${block.getFieldValue('key')}"]`;
+      case 'button_pressed': {
+        const name = block.getFieldValue('name').replace(/\s+/g,'_');
+        return `window.buttons["${name}"] && window.buttons["${name}"].pressed`;
+      }
+      case 'math_operation':
+        return `(${genExpr(block.getInputTargetBlock('A'))}${block.getFieldValue('OP')}${genExpr(block.getInputTargetBlock('B'))})`;
+      case 'logic_not':
+        return `(!${genExpr(block.getInputTargetBlock('BOOL'))})`;
+      case 'logic_compare':
+        return `(${genExpr(block.getInputTargetBlock('A'))} === ${genExpr(block.getInputTargetBlock('B'))})`;
+      case 'logic_boolean':
+        return block.getFieldValue('BOOL') === 'true' ? 'true' : 'false';
+      default:
+        if(block.getFieldValue && block.getFieldValue('text')) return JSON.stringify(block.getFieldValue('text'));
+        return 'false';
+    }
+  }
+
+  function genStmt(block) {
+    if(!block) return '';
+    const t = block.type;
+    let code = '';
+    if(t==='when_html_starts') code += `window.onload = async function(){ ${genStmt(block.getInputTargetBlock('DO'))} };`;
+    if(t==='title_block') {
+      const txt=block.getFieldValue('text'), f=block.getFieldValue('font'),
+            x=block.getFieldValue('x'), y=block.getFieldValue('y'),
+            id=txt.replace(/\s+/g,'_');
+      code += `document.body.innerHTML+="<h1 id='${id}' style='position:absolute;left:${x}px;top:${y}px;font-family:${f}'>${txt}</h1>";`;
+    }
+    if(t==='show_title') code+=`document.getElementById("${block.getFieldValue('text').replace(/\s+/g,'_')}").style.display='block';`;
+    if(t==='hide_title') code+=`document.getElementById("${block.getFieldValue('text').replace(/\s+/g,'_')}").style.display='none';`;
+    if(t==='wait_seconds') code+=`await new Promise(r=>setTimeout(r,${block.getFieldValue('seconds')}*1000));`;
+
+    if(t==='wait_until') {
+      const cond = genExpr(block.getInputTargetBlock('COND'));
+      code += `await waitUntil(() => (${cond}));`;
+    }
+
+    if(t==='if_block') code+=`if(${genExpr(block.getInputTargetBlock('condition'))}){${genStmt(block.getInputTargetBlock('DO'))}}`;
+    if(t==='if_else_block') code+=`if(${genExpr(block.getInputTargetBlock('condition'))}){${genStmt(block.getInputTargetBlock('DO'))}}else{${genStmt(block.getInputTargetBlock('ELSE'))}}`;
+    if(t==='forever_loop') code+=`while(true){${genStmt(block.getInputTargetBlock('DO'))}await new Promise(r=>setTimeout(r,0));}`;
+
+    if(t==='change_background_color') {
+      const color = block.getFieldValue('color');
+      code += `document.body.style.backgroundColor = "${color}";`;
+    }
+    if(t==='change_title_color') {
+      const txt = block.getFieldValue('text').replace(/\s+/g,'_');
+      const color = block.getFieldValue('color');
+      code += `(function(){const el=document.getElementById("${txt}");if(el)el.style.color="${color}";})();`;
+    }
+    if(t==='button_create') {
+      const name = block.getFieldValue('name').replace(/\s+/g,'_');
+      const x = block.getFieldValue('x');
+      const y = block.getFieldValue('y');
+      const width = block.getFieldValue('width');
+      const height = block.getFieldValue('height');
+      const color = block.getFieldValue('color');
+      code += `(function(){
+        if(!window.buttons) window.buttons = {};
+        let btn = document.createElement("button");
+        btn.id = "${name}";
+        btn.style.position = "absolute";
+        btn.style.left = "${x}px";
+        btn.style.top = "${y}px";
+        btn.style.width = "${width}px";
+        btn.style.height = "${height}px";
+        btn.style.backgroundColor = "${color}";
+        btn.textContent = "${name}";
+        document.body.appendChild(btn);
+        window.buttons["${name}"] = {el: btn, pressed:false};
+        btn.addEventListener("mousedown", () => window.buttons["${name}"].pressed = true);
+        btn.addEventListener("mouseup", () => window.buttons["${name}"].pressed = false);
+        btn.addEventListener("mouseleave", () => window.buttons["${name}"].pressed = false);
+      })();`;
+    }
+
+    return code + genStmt(block.getNextBlock());
+  }
+
+  // Run/Stop and Download button logic
+  const runBtn = document.getElementById('runBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const preview = document.getElementById('preview');
+  const editor = document.getElementById('editor');
+
+  let running = false;
+
+  runBtn.onclick = () => {
+    const code = `
+      <script>
+        let pressedKeys = {};
+        window.addEventListener('keydown', e => pressedKeys[e.key] = true);
+        window.addEventListener('keyup', e => pressedKeys[e.key] = false);
+        let mousedown = false;
+        window.addEventListener('mousedown', () => mousedown = true);
+        window.addEventListener('mouseup', () => mousedown = false);
+        Object.defineProperty(window, 'mousedown', {get: () => mousedown});
+
+        function waitUntil(condFunc) {
+          return new Promise(resolve => {
+            function check() {
+              if(condFunc()) resolve();
+              else setTimeout(check, 50);
+            }
+            check();
+          });
+        }
+
+        window.buttons = {};
+
+        async function main() {
+          ${genStmt(workspace.getTopBlocks(false)[0])}
+        }
+
+        main();
+      <\/script>
+    `;
+
+    preview.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Preview</title></head><body style="margin:0;">${code}</body></html>`;
+    preview.style.display = "block";
+    editor.style.display = "none";
+    runBtn.style.display = "none";
+    stopBtn.style.display = "inline-block";
+    running = true;
+  };
+
+  stopBtn.onclick = () => {
+    preview.style.display = "none";
+    editor.style.display = "block";
+    runBtn.style.display = "inline-block";
+    stopBtn.style.display = "none";
+    running = false;
+    preview.srcdoc = "about:blank";
+  };
+
+  downloadBtn.onclick = () => {
+    const code = `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"><title>Downloaded Program</title></head>
+      <body style="margin:0;">
+        <script>
+          let pressedKeys = {};
+          window.addEventListener('keydown', e => pressedKeys[e.key] = true);
+          window.addEventListener('keyup', e => pressedKeys[e.key] = false);
+          let mousedown = false;
+          window.addEventListener('mousedown', () => mousedown = true);
+          window.addEventListener('mouseup', () => mousedown = false);
+          Object.defineProperty(window, 'mousedown', {get: () => mousedown});
+
+          function waitUntil(condFunc) {
+            return new Promise(resolve => {
+              function check() {
+                if(condFunc()) resolve();
+                else setTimeout(check, 50);
+              }
+              check();
+            });
+          }
+
+          window.buttons = {};
+
+          async function main() {
+            ${genStmt(workspace.getTopBlocks(false)[0])}
+          }
+
+          main();
+        <\/script>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([code], {type: "text/html"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "program.html";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+};
+  </script>
+</body>
+</html>
