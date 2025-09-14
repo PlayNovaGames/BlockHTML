@@ -1,12 +1,12 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BlockHTML V0.2 Alpha</title>
+  <title>BlockHTML V0.4 Alpha</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <style>
-    html, body { margin:0; height:100%; background:#121212; color:#fff; overflow:hidden; }
-    #topbar { height:40px; background:#1f1f1f; display:flex; align-items:center; justify-content:space-between; padding:0 10px; }
+    html, body { margin:0; height:100%; background:#121212; color:#fff; overflow:hidden; font-family: Arial, sans-serif; }
+    #topbar { height:40px; background:#1f1f1f; display:flex; align-items:center; justify-content:space-between; padding:0 10px; font-family: Arial, sans-serif; }
     #topbar span { font-weight:bold; }
     #topbar button { margin-left:10px; background:#03dac6; border:none; padding:6px 12px; cursor:pointer; color:black; }
     #editor { height:calc(100% - 40px); }
@@ -16,7 +16,7 @@
 </head>
 <body>
   <div id="topbar">
-    <span>BlockHTML V0.3 Alpha</span>
+    <span>BlockHTML V0.4 Alpha</span>
     <div>
       <button id="downloadBtn">Download Code</button>
       <button id="runBtn">Run</button>
@@ -50,6 +50,11 @@
     <block type="logic_compare"></block>
     <block type="change_background_color"></block>
     <block type="change_title_color"></block>
+    <block type="move_title_by"></block>
+    <block type="move_title_to"></block>
+    <block type="move_button_by"></block>
+    <block type="move_button_to"></block>
+    <block type="collision_detect"></block>
   </xml>
 
   <script>
@@ -68,10 +73,7 @@ window.onload = function() {
     { type: "show_title", message0: "Show title %1", args0:[{type:"field_input",name:"text",text:"Hello"}], previousStatement:null,nextStatement:null,colour:100 },
     { type: "hide_title", message0: "Hide title %1", args0:[{type:"field_input",name:"text",text:"Hello"}], previousStatement:null,nextStatement:null,colour:100 },
     { type: "wait_seconds", message0: "Wait %1 seconds", args0:[{type:"field_number",name:"seconds",value:1}], previousStatement:null,nextStatement:null,colour:65 },
-
-    // Wait until block
     { type: "wait_until", message0: "Wait until %1", args0: [{type:"input_value", name:"COND", check:"Boolean"}], previousStatement:null, nextStatement:null, colour:65 },
-
     { type: "if_block", message0: "If %1 do %2", args0:[{type:"input_value",name:"condition",check:"Boolean"},{type:"input_statement",name:"DO"}], previousStatement:null,nextStatement:null,colour:210 },
     { type: "if_else_block", message0: "If %1 do %2 else %3", args0:[{type:"input_value",name:"condition",check:"Boolean"},{type:"input_statement",name:"DO"},{type:"input_statement",name:"ELSE"}], previousStatement:null,nextStatement:null,colour:210 },
     { type: "forever_loop", message0: "Forever %1", args0:[{type:"input_statement",name:"DO"}], previousStatement:null,nextStatement:null,colour:290 },
@@ -89,8 +91,6 @@ window.onload = function() {
       ]}],
       output:"Boolean",colour:120
     },
-
-    // Create Button block
     {
       type: "button_create",
       message0: "Create button %1 at X: %2 Y: %3 width: %4 height: %5 color (hex): %6",
@@ -106,61 +106,27 @@ window.onload = function() {
       nextStatement: null,
       colour: 160
     },
-
-    // Button pressed block
     {
       type: "button_pressed",
       message0: "Is button %1 pressed?",
-      args0: [
-        { type: "field_input", name: "name", text: "btn" }
-      ],
+      args0: [{ type: "field_input", name: "name", text: "btn" }],
       output: "Boolean",
       colour: 120
     },
-
-    // Boolean dropdown block (true/false)
-    {
-      type: "logic_boolean",
-      message0: "%1",
-      args0: [
-        { type: "field_dropdown", name: "BOOL", options: [["true", "true"], ["false", "false"]] }
-      ],
-      output: "Boolean",
-      colour: 210
-    },
-
+    { type: "logic_boolean", message0: "%1", args0:[{ type: "field_dropdown", name: "BOOL", options: [["true", "true"], ["false", "false"]] }], output:"Boolean", colour:210 },
     { type: "math_operation", message0: "%1 %2 %3",
       args0:[{type:"input_value",name:"A",check:"Number"},{type:"field_dropdown",name:"OP",options:[["+","+"],["-","-"],["×","*"],["÷","/"]]},{type:"input_value",name:"B",check:"Number"}],
       output:"Number",colour:230
     },
     { type: "logic_not", message0: "Not %1", args0:[{type:"input_value",name:"BOOL",check:"Boolean"}], output:"Boolean",colour:210 },
-    { type: "logic_compare", message0: "%1 = %2", args0:[
-      {type:"input_value",name:"A"},
-      {type:"input_value",name:"B"}
-    ], output:"Boolean", colour:210 },
-
-    // Change colour hex input
-    {
-      type: "change_background_color",
-      message0: "Change background colour to %1",
-      args0: [
-        { type: "field_input", name: "color", text: "#ffffff" }
-      ],
-      previousStatement: null,
-      nextStatement: null,
-      colour: 20
-    },
-    {
-      type: "change_title_color",
-      message0: "Change title colour of %1 to %2",
-      args0: [
-        { type: "field_input", name: "text", text: "Hello" },
-        { type: "field_input", name: "color", text: "#000000" }
-      ],
-      previousStatement: null,
-      nextStatement: null,
-      colour: 20
-    }
+    { type: "logic_compare", message0: "%1 = %2", args0:[{type:"input_value",name:"A"},{type:"input_value",name:"B"}], output:"Boolean", colour:210 },
+    { type: "change_background_color", message0: "Change background colour to %1", args0:[{ type:"field_input", name:"color", text:"#ffffff"}], previousStatement:null, nextStatement:null, colour:20 },
+    { type: "change_title_color", message0: "Change title colour of %1 to %2", args0:[{type:"field_input",name:"text",text:"Hello"},{type:"field_input",name:"color",text:"#000000"}], previousStatement:null,nextStatement:null,colour:20 },
+    { type: "move_title_by", message0: "Move title %1 by X %2 Y %3", args0:[{type:"field_input",name:"text",text:"Hello"},{type:"field_number",name:"dx",value:0},{type:"field_number",name:"dy",value:0}], previousStatement:null, nextStatement:null, colour:160 },
+    { type: "move_title_to", message0: "Move title %1 to X %2 Y %3", args0:[{type:"field_input",name:"text",text:"Hello"},{type:"field_number",name:"x",value:0},{type:"field_number",name:"y",value:0}], previousStatement:null, nextStatement:null, colour:160 },
+    { type: "move_button_by", message0: "Move button %1 by X %2 Y %3", args0:[{type:"field_input",name:"name",text:"btn"},{type:"field_number",name:"dx",value:0},{type:"field_number",name:"dy",value:0}], previousStatement:null, nextStatement:null, colour:160 },
+    { type: "move_button_to", message0: "Move button %1 to X %2 Y %3", args0:[{type:"field_input",name:"name",text:"btn"},{type:"field_number",name:"x",value:0},{type:"field_number",name:"y",value:0}], previousStatement:null, nextStatement:null, colour:160 },
+    { type: "collision_detect", message0: "Is %1 touching %2 targeting %3", args0:[{type:"field_input",name:"A",text:"obj1"},{type:"field_input",name:"B",text:"obj2"},{type:"field_dropdown",name:"filter",options:[["Title","title"],["Button","button"],["Unfiltered","unfiltered"]]}], output:"Boolean", colour:120 }
   ]);
 
   const theme = Blockly.Theme.defineTheme('dark', {
@@ -188,14 +154,16 @@ window.onload = function() {
         const name = block.getFieldValue('name').replace(/\s+/g,'_');
         return `window.buttons["${name}"] && window.buttons["${name}"].pressed`;
       }
-      case 'math_operation':
-        return `(${genExpr(block.getInputTargetBlock('A'))}${block.getFieldValue('OP')}${genExpr(block.getInputTargetBlock('B'))})`;
-      case 'logic_not':
-        return `(!${genExpr(block.getInputTargetBlock('BOOL'))})`;
-      case 'logic_compare':
-        return `(${genExpr(block.getInputTargetBlock('A'))} === ${genExpr(block.getInputTargetBlock('B'))})`;
-      case 'logic_boolean':
-        return block.getFieldValue('BOOL') === 'true' ? 'true' : 'false';
+      case 'math_operation': return `(${genExpr(block.getInputTargetBlock('A'))}${block.getFieldValue('OP')}${genExpr(block.getInputTargetBlock('B'))})`;
+      case 'logic_not': return `(!${genExpr(block.getInputTargetBlock('BOOL'))})`;
+      case 'logic_compare': return `(${genExpr(block.getInputTargetBlock('A'))} === ${genExpr(block.getInputTargetBlock('B'))})`;
+      case 'logic_boolean': return block.getFieldValue('BOOL') === 'true' ? 'true' : 'false';
+      case 'collision_detect': {
+        const a = block.getFieldValue('A').replace(/\s+/g,'_');
+        const b = block.getFieldValue('B').replace(/\s+/g,'_');
+        const filter = block.getFieldValue('filter');
+        return `checkCollision("${a}", "${b}", "${filter}")`;
+      }
       default:
         if(block.getFieldValue && block.getFieldValue('text')) return JSON.stringify(block.getFieldValue('text'));
         return 'false';
@@ -216,25 +184,12 @@ window.onload = function() {
     if(t==='show_title') code+=`document.getElementById("${block.getFieldValue('text').replace(/\s+/g,'_')}").style.display='block';`;
     if(t==='hide_title') code+=`document.getElementById("${block.getFieldValue('text').replace(/\s+/g,'_')}").style.display='none';`;
     if(t==='wait_seconds') code+=`await new Promise(r=>setTimeout(r,${block.getFieldValue('seconds')}*1000));`;
-
-    if(t==='wait_until') {
-      const cond = genExpr(block.getInputTargetBlock('COND'));
-      code += `await waitUntil(() => (${cond}));`;
-    }
-
+    if(t==='wait_until') { const cond = genExpr(block.getInputTargetBlock('COND')); code += `await waitUntil(() => (${cond}));`; }
     if(t==='if_block') code+=`if(${genExpr(block.getInputTargetBlock('condition'))}){${genStmt(block.getInputTargetBlock('DO'))}}`;
     if(t==='if_else_block') code+=`if(${genExpr(block.getInputTargetBlock('condition'))}){${genStmt(block.getInputTargetBlock('DO'))}}else{${genStmt(block.getInputTargetBlock('ELSE'))}}`;
     if(t==='forever_loop') code+=`while(true){${genStmt(block.getInputTargetBlock('DO'))}await new Promise(r=>setTimeout(r,0));}`;
-
-    if(t==='change_background_color') {
-      const color = block.getFieldValue('color');
-      code += `document.body.style.backgroundColor = "${color}";`;
-    }
-    if(t==='change_title_color') {
-      const txt = block.getFieldValue('text').replace(/\s+/g,'_');
-      const color = block.getFieldValue('color');
-      code += `(function(){const el=document.getElementById("${txt}");if(el)el.style.color="${color}";})();`;
-    }
+    if(t==='change_background_color') { const color = block.getFieldValue('color'); code += `document.body.style.backgroundColor = "${color}";`; }
+    if(t==='change_title_color') { const txt = block.getFieldValue('text').replace(/\s+/g,'_'); const color = block.getFieldValue('color'); code += `(function(){const el=document.getElementById("${txt}");if(el)el.style.color="${color}";})();`; }
     if(t==='button_create') {
       const name = block.getFieldValue('name').replace(/\s+/g,'_');
       const x = block.getFieldValue('x');
@@ -260,21 +215,35 @@ window.onload = function() {
         btn.addEventListener("mouseleave", () => window.buttons["${name}"].pressed = false);
       })();`;
     }
-
+    if(t==='move_title_by') {
+      const txt = block.getFieldValue('text').replace(/\s+/g,'_');
+      const dx = block.getFieldValue('dx');
+      const dy = block.getFieldValue('dy');
+      code += `(function(){const el=document.getElementById("${txt}");if(el){el.style.left=(parseInt(el.style.left||0)+${dx})+"px";el.style.top=(parseInt(el.style.top||0)+${dy})+"px";}})();`;
+    }
+    if(t==='move_title_to') {
+      const txt = block.getFieldValue('text').replace(/\s+/g,'_');
+      const x = block.getFieldValue('x');
+      const y = block.getFieldValue('y');
+      code += `(function(){const el=document.getElementById("${txt}");if(el){el.style.left="${x}px";el.style.top="${y}px";}})();`;
+    }
+    if(t==='move_button_by') {
+      const name = block.getFieldValue('name').replace(/\s+/g,'_');
+      const dx = block.getFieldValue('dx');
+      const dy = block.getFieldValue('dy');
+      code += `(function(){const el=document.getElementById("${name}");if(el){el.style.left=(parseInt(el.style.left||0)+${dx})+"px";el.style.top=(parseInt(el.style.top||0)+${dy})+"px";}})();`;
+    }
+    if(t==='move_button_to') {
+      const name = block.getFieldValue('name').replace(/\s+/g,'_');
+      const x = block.getFieldValue('x');
+      const y = block.getFieldValue('y');
+      code += `(function(){const el=document.getElementById("${name}");if(el){el.style.left="${x}px";el.style.top="${y}px";}})();`;
+    }
     return code + genStmt(block.getNextBlock());
   }
 
-  // Run/Stop and Download button logic
-  const runBtn = document.getElementById('runBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const preview = document.getElementById('preview');
-  const editor = document.getElementById('editor');
-
-  let running = false;
-
-  runBtn.onclick = () => {
-    const code = `
+  function runtimeHelpers() {
+    return `
       <script>
         let pressedKeys = {};
         window.addEventListener('keydown', e => pressedKeys[e.key] = true);
@@ -286,30 +255,48 @@ window.onload = function() {
 
         function waitUntil(condFunc) {
           return new Promise(resolve => {
-            function check() {
-              if(condFunc()) resolve();
-              else setTimeout(check, 50);
-            }
+            function check() { if(condFunc()) resolve(); else setTimeout(check, 50); }
             check();
           });
         }
 
-        window.buttons = {};
+        function checkCollision(idA, idB, filter) {
+          const a = document.getElementById(idA);
+          const b = document.getElementById(idB);
+          if(!a || !b) return false;
+          if(filter === "title" && (a.tagName !== "H1" || b.tagName !== "H1")) return false;
+          if(filter === "button" && (a.tagName !== "BUTTON" || b.tagName !== "BUTTON")) return false;
+          const rA = a.getBoundingClientRect();
+          const rB = b.getBoundingClientRect();
+          return !(rA.right < rB.left || rA.left > rB.right || rA.bottom < rB.top || rA.top > rB.bottom);
+        }
 
+        window.buttons = {};
+      <\/script>
+    `;
+  }
+
+  const runBtn = document.getElementById('runBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const preview = document.getElementById('preview');
+  const editor = document.getElementById('editor');
+
+  runBtn.onclick = () => {
+    const code = `
+      ${runtimeHelpers()}
+      <script>
         async function main() {
           ${genStmt(workspace.getTopBlocks(false)[0])}
         }
-
         main();
       <\/script>
     `;
-
     preview.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Preview</title></head><body style="margin:0;">${code}</body></html>`;
     preview.style.display = "block";
     editor.style.display = "none";
     runBtn.style.display = "none";
     stopBtn.style.display = "inline-block";
-    running = true;
   };
 
   stopBtn.onclick = () => {
@@ -317,7 +304,6 @@ window.onload = function() {
     editor.style.display = "block";
     runBtn.style.display = "inline-block";
     stopBtn.style.display = "none";
-    running = false;
     preview.srcdoc = "about:blank";
   };
 
@@ -327,37 +313,16 @@ window.onload = function() {
       <html>
       <head><meta charset="utf-8"><title>Downloaded Program</title></head>
       <body style="margin:0;">
+        ${runtimeHelpers()}
         <script>
-          let pressedKeys = {};
-          window.addEventListener('keydown', e => pressedKeys[e.key] = true);
-          window.addEventListener('keyup', e => pressedKeys[e.key] = false);
-          let mousedown = false;
-          window.addEventListener('mousedown', () => mousedown = true);
-          window.addEventListener('mouseup', () => mousedown = false);
-          Object.defineProperty(window, 'mousedown', {get: () => mousedown});
-
-          function waitUntil(condFunc) {
-            return new Promise(resolve => {
-              function check() {
-                if(condFunc()) resolve();
-                else setTimeout(check, 50);
-              }
-              check();
-            });
-          }
-
-          window.buttons = {};
-
           async function main() {
             ${genStmt(workspace.getTopBlocks(false)[0])}
           }
-
           main();
         <\/script>
       </body>
       </html>
     `;
-
     const blob = new Blob([code], {type: "text/html"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -366,7 +331,6 @@ window.onload = function() {
     a.click();
     URL.revokeObjectURL(url);
   };
-
 };
   </script>
 </body>
